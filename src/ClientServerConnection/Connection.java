@@ -30,6 +30,13 @@ public class Connection {
         this.runConnection();
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+    
+    
+    
     public void runConnection() {
         connectionThread = new Thread(new Runnable() {
             @Override
@@ -77,5 +84,7 @@ public class Connection {
             System.out.println("sernd error: " + e.getMessage());
         }
     }
+
+   
 
 }

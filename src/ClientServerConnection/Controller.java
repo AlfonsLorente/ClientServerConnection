@@ -9,10 +9,9 @@ package ClientServerConnection;
  *
  * @author alfon
  */
-public class MyTask {
-    public static void main(String[] args) {
-        Viewer viewer = new Viewer();
-        Model model = new Model();
-        Controller controller = new Controller(viewer, model);
+public class Controller {
+    public Controller(Viewer viewer, Model model){
+        
     }
+    
 }

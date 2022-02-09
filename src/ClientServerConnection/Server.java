@@ -7,6 +7,7 @@ package ClientServerConnection;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *
@@ -15,11 +16,12 @@ import java.net.Socket;
 public class Server {
     private ServerSocket serverSocket;
     private Socket socket;
-    private MyTask myTask;
+    private Model myTask;
     Thread serverThread;
+    private  ArrayList<Connection> bufferConnection;
     
-    public Server(MyTask myTask){
-        this.myTask = myTask;
+    public Server(ArrayList<Connection> bufferConnection){
+        this.bufferConnection = bufferConnection;
     }
     
     public void run(int port){

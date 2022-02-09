@@ -14,6 +14,7 @@ import java.net.Socket;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,11 +22,12 @@ import java.util.logging.Logger;
 public class Client {
 
     private Socket socket;
-    private MyTask myTask;
+    private Model myTask;
     private Connection connection;
+    private final ArrayList<Connection> connectionList;
 
-    public Client(MyTask myTask) {
-        this.myTask = myTask;
+    public Client(ArrayList<Connection> connectionList) {
+        this.connectionList = connectionList;
     }
 
     public void run() {
@@ -34,7 +36,7 @@ public class Client {
         Thread clientThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                //while (true) {
 
                     System.out.println("Introduce the server IP:");
                     String ip = scanner.nextLine();
@@ -49,7 +51,7 @@ public class Client {
                     } catch (IOException ex) {
                         Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
+                //}
             }
         });
         clientThread.start();
