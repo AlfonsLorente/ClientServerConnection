@@ -24,37 +24,22 @@ public class Client {
     private Socket socket;
     private Model myTask;
     private Connection connection;
-    private final ArrayList<Connection> connectionList;
+    private ArrayList<Connection> bufferConnection;
 
-    public Client(ArrayList<Connection> connectionList) {
-        this.connectionList = connectionList;
+    public Client(ArrayList<Connection> bufferConnection) {
+        this.bufferConnection = bufferConnection;
     }
 
-    public void run() {
-        Scanner scanner = new Scanner(System.in);
+    public void connect(String ip, int port) {
+        try {
+            socket = new Socket(ip, port);
+            connection = new Connection(socket);
+            bufferConnection.add(connection);
 
-        Thread clientThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //while (true) {
-
-                    System.out.println("Introduce the server IP:");
-                    String ip = scanner.nextLine();
-                    System.out.println("Introduce the server port");
-                    int port = Integer.parseInt(scanner.nextLine());
-
-                    try {
-                        socket = new Socket(ip, port);
-                        connection = new Connection(socket);
-                        myTask.bufferConnection.add(connection);
-
-                    } catch (IOException ex) {
-                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                //}
-            }
-        });
-        clientThread.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
+
 }
