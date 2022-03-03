@@ -4,111 +4,91 @@
  * and open the template in the editor.
  */
 package ClientServerConnection;
+import java.util.ArrayList;
 
-import java.awt.Dimension;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 
-/**
- *
- * @author alfon
- */
 public class Viewer extends JFrame{
-    public JTabbedPane tabs;
-    public JPanel server;
-    public JPanel client;
-    public JTextArea textArea;
-    public JScrollPane scroller;
-    public JButton button;
-    public JTextField ip; 
-    public JTextField port; 
-    
-    
-    public Viewer(){
-        setUpViewer();
-        
-        
-        tabs = new JTabbedPane();
-        
-        server = new JPanel();
-        
-        server.setLayout(null);
-        
-        textArea = new JTextArea();
-        textArea.setBounds(10, 50, 400, 300);
-        
-        textArea.setEditable(false);
-        server.add(textArea);
-        scroller = new JScrollPane(textArea);
-        scroller.setBounds(10,50,400,300);
-        
-        server.add(scroller);
-        
-        
-        tabs.addTab("Server", server);
-        
-        client = new JPanel();
-        client.setLayout(null);
-        textArea = new JTextArea(400,300);
-        textArea.setBounds(10, 50, 400, 300);
-        scroller = new JScrollPane(textArea);
-        scroller.setBounds(10, 50, 400, 300);
-        client.add(scroller);
-        
-        button = new JButton("Connectar");
-        button.setBounds(10,400,100,30);
-        client.add(button);
-        
-        ip = new JTextField();
-        ip.setBounds(130,400, 100,30);
-        client.add(ip);
-        
-        port = new JTextField();
-        port.setBounds(250,400, 50,30);
-        client.add(port);
-        
-        
-        tabs.add("Client", client);
-        
-        
-        this.add(tabs);
-        this.setVisible(true);
-       
-    }
+	public JTabbedPane pestanyes;
+	public JTextArea comLog;
+	public JButton connectarButton;
+	public JTextField ip;
+	public JTextField port;
+	
+	public ArrayList<JTextArea> llistaTextArea = new ArrayList<JTextArea>();
+	public ArrayList<JTextField> llistaMsgs = new ArrayList<JTextField>();
+	public ArrayList<JButton> llistaButtons = new ArrayList<JButton>();
+	public ArrayList<JPanel> llistaPanels = new ArrayList<JPanel>();
+	
+	public Viewer() {
+		//Instanciam atributs de classe
+		pestanyes = new JTabbedPane();
+		
+		//Parametritzar el JFrame (finestra)
+		setBounds(0,0,500,550);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//Cream la primera pestanya
+		JPanel ServPane = new JPanel();
+		ServPane.setLayout(null);
+		
+		comLog = new JTextArea(450,300);
+		comLog.setBounds(10,50,450,300);
+		comLog.setEditable(false);
+		
+		JScrollPane logScroll = new JScrollPane(comLog);
+		logScroll.setBounds(10,50,450,300);
+		ServPane.add(logScroll);
+		
+		connectarButton = new JButton("Connectar");
+		connectarButton.setBounds(10,400,100,30);
+		ServPane.add(connectarButton);
+		
+		ip = new JTextField();
+		ip.setBounds(130,400,100,30);
+		ServPane.add(ip);
+		
+		port = new JTextField();
+		port.setBounds(250,400,50,30);
+		ServPane.add(port);
+		
+		pestanyes.add("Servidor",ServPane);
+		
+		//Afegir pestanyes al contenidor de la finestra
+		getContentPane().add(pestanyes);
+		setVisible(true);	
+	}
+	
+	public void novaPestanya(String ip) {
+		JPanel panel;
+		JScrollPane scroll;
+		JTextArea textArea;
+		JTextField msg;
+		JButton button;
 
-    
-    private void setUpViewer() {
-        this.setBounds(0,0,800,500);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-    }
-    
-    public void newTab(){
-        JPanel panel;
-        JScrollPane scroller;
-        JTextArea textArea;
-        
-        panel = new JPanel();
-        panel.setLayout(null);
-        
-        textArea = new JTextArea(400,300);
-        textArea.setBounds(10, 50, 400, 300);
-        textArea.setEditable(false);
-        scroller = new JScrollPane(textArea);
-        scroller.setBounds(10, 50, 400, 300);
-        panel.add(scroller);
-        tabs.addTab("New", panel);
-        
-        
-        
-        
-    }
-    
-    
+		panel = new JPanel();
+		panel.setLayout(null);
+		
+		textArea = new JTextArea(450,300);
+		textArea.setBounds(10,50,450,300);
+		textArea.setEditable(false);
+		scroll = new JScrollPane(textArea);
+		scroll.setBounds(10,50,450,300);
+		panel.add(scroll);
+		llistaTextArea.add(textArea);
+		
+		msg = new JTextField();
+		msg.setBounds(10,400,370,30);
+		panel.add(msg);
+		llistaMsgs.add(msg);
+		
+		button = new JButton(">");
+		button.setBounds(390,400,70,30);
+		panel.add(button);
+		llistaButtons.add(button);
+		
+		pestanyes.addTab(ip, panel);
+		llistaPanels.add(panel);
+		
+	}
 }

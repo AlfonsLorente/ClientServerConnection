@@ -6,25 +6,33 @@
 package ClientServerConnection;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
-/**
- *
- * @author alfon
- */
 public class Model {
+	private Client client;
+	private Server servidor;
+	private ArrayList<Connection> bufferConnection = new ArrayList<Connection>();
+	private EventsListener eventsListener;
+	
+	public Model (EventsListener eventsListener) {
+		this.eventsListener=eventsListener;
+	}
 
-    public ArrayList<Connection> bufferConnection = new ArrayList<Connection>();
-
-    public Model(){
-        Server server = new Server(bufferConnection);
-        Client client = new Client(bufferConnection);
-        int port = 7070;
-        server.run(port);
-
-        }
-        
-
-    
-
+	public void iniciarServidor (int port) {
+		servidor = new Server(bufferConnection, eventsListener);
+		servidor.runServer(port);
+	}
+			
+	public String establirConnexio (String ip, int port) {
+		this.client = new Client(bufferConnection, eventsListener);
+		String msgState = this.client.Connectar(ip, port);
+		return msgState;
+	}
+	
+	public Server getServidor() {
+		return this.servidor;
+	}
+	
+	public ArrayList<Connection> getBufferConnection (){
+		return this.bufferConnection;
+	}
 }

@@ -9,41 +9,36 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-/**
- *
- * @author alfon
- */
 public class Server {
-    private ServerSocket serverSocket;
-    private Socket socket;
-    private Model myTask;
-    Thread serverThread;
-    private  ArrayList<Connection> bufferConnection;
-    
-    public Server(ArrayList<Connection> bufferConnection){
-        this.bufferConnection = bufferConnection;
-    }
-    
-    public void run(int port){
-        serverThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-               try{
-                    serverSocket = new ServerSocket(port);
-                    while(true){
-                        System.out.println("Waiting for connection...");
-                        socket = serverSocket.accept();
-                        Connection connection = new Connection(socket);
-                        myTask.bufferConnection.add(connection);
-                        System.out.println("Buffer Size: " + myTask.bufferConnection.size());
-
-                    }
-                }catch(Exception e){
-                System.out.println(e.getMessage());
-            }
-        }
-        });
-        serverThread.start();
-   
-    }
+	private ServerSocket serverSocket;
+	private Socket socket;
+	private int port;
+	private ArrayList<Connection> bufferConnection;
+	private EventsListener eventsListener;
+	
+	public Server ( ArrayList<Connection> bufferConnection, EventsListener eventsListener) {
+		this.bufferConnection=bufferConnection;
+		this.eventsListener=eventsListener;
+	}
+	
+	public void runServer(int port) {
+		Thread serverThread = new Thread (new Runnable () {
+			@Override
+			public void run() {
+				try {
+					serverSocket = new ServerSocket(port);
+					while(true) {
+						socket=serverSocket.accept();
+						Connection connection = new Connection(socket);
+						connection.addListener(eventsListener);
+						connection.triggerConnectionEvent();
+						bufferConnection.add(connection);
+					}	
+				}catch(Exception e) {
+					System.out.println("Error al runServer: "+e.getMessage());
+				}
+			}
+		});
+		serverThread.start();
+	}
 }

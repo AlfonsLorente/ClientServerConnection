@@ -9,37 +9,34 @@ package ClientServerConnection;
  *
  * @author alfon
  */
-import java.io.*;
 import java.net.Socket;
-
-import java.io.*;
-import java.net.*;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import java.net.Socket;
+import java.util.ArrayList;
 
 public class Client {
-
-    private Socket socket;
-    private Model myTask;
-    private Connection connection;
-    private ArrayList<Connection> bufferConnection;
-
-    public Client(ArrayList<Connection> bufferConnection) {
-        this.bufferConnection = bufferConnection;
-    }
-
-    public void connect(String ip, int port) {
-        try {
-            socket = new Socket(ip, port);
-            connection = new Connection(socket);
-            bufferConnection.add(connection);
-
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
+	private ArrayList<Connection> bufferConnection;
+	private EventsListener eventsListener;
+	
+	public Client (ArrayList<Connection> bufferConnection,EventsListener eventsListener) {
+		this.bufferConnection=bufferConnection;
+		this.eventsListener=eventsListener;
+	}
+	
+	public String Connectar(String ip, int port) {
+		String msgState;
+		try {
+			Socket socket = new Socket(ip,port);
+			Connection connection = new Connection(socket);
+			connection.addListener(eventsListener);
+			connection.triggerConnectionEvent();
+			bufferConnection.add(connection);
+			msgState = "Connexió establerta amb: "+ip+":"+port;
+		}catch (Exception e) {
+			System.out.println("Error al connectar: "+ e.getMessage());
+			msgState = "Error al connectar: "+ e.getMessage();
+		}
+		return msgState;
+	}
 }

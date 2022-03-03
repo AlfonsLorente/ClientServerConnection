@@ -7,28 +7,14 @@ package ClientServerConnection;
 
 import java.io.Serializable;
 
-/**
- *
- * @author alfon
- */
-public class Message implements Serializable{
-    private String message = "Patata";
+public class Message implements Serializable {
+	private String msg = new String();
 
-    public Message() {
-    }
+	public String getMsg() {
+		return msg;
+	}
 
-    
-    
-    public String getMessage() {
-        return(message);
-    
-        
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-    
-    
-    
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
 }
