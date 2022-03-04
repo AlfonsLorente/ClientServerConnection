@@ -163,6 +163,8 @@ public class Viewer extends JFrame {
 
         button = new JButton("Send");
         button.setBounds(390, 410, 70, 30);
+        button.setBackground(Color.WHITE);
+
         panel.add(button);
         buttons.add(button);
 
@@ -179,6 +181,10 @@ public class Viewer extends JFrame {
         this.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
         this.setResizable(false);
         this.setBackground(Color.yellow);
+        this.setIconImage(new ImageIcon("ICO/icoClientServerBlack.png").getImage());
+        this.setBackground(Color.BLACK);
+
+
     }
 
     private void setUpServerPanel() {
@@ -187,6 +193,7 @@ public class Viewer extends JFrame {
         commsLog = new JTextArea(200, 300);
         commsLog.setBounds(10, 50, 450, 300);
         commsLog.setEditable(false);
+        
 
         JScrollPane logScroll = new JScrollPane(commsLog);
         logScroll.setBounds(15, 20, 450, 300);
@@ -213,7 +220,10 @@ public class Viewer extends JFrame {
         port.setBounds(350, 350, 50, 30);
         serverPanel.add(port);
         connectButton = new JButton("Connectar");
+        connectButton.setBackground(Color.WHITE);
+        
         connectButton.setBounds(200, 400, 100, 30);
         serverPanel.add(connectButton);
+
     }
 }
