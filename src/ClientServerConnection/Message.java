@@ -8,13 +8,14 @@ package ClientServerConnection;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-	private String msg = new String();
 
-	public String getMsg() {
-		return msg;
-	}
+    private String message = new String();
 
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

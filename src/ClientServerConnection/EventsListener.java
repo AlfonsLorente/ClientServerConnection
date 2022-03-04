@@ -8,9 +8,13 @@ package ClientServerConnection;
 import java.util.EventListener;
 
 //A la interficie definim quins metodes és podrán executar quan és disparin els events
-public interface EventsListener extends EventListener{
-	public abstract void onNewConnection (EventsConnection event);
-	public abstract void onNewEnviarConnection (EventsConnection event, Message msg);
-	public abstract void onNewRebreConnection (EventsConnection event, Message msg);
-	public abstract void onNewErrorConnection (EventsConnection event);
+public interface EventsListener extends EventListener {
+
+    public abstract void onNewConnection(EventsConnection event);
+
+    public abstract void onNewSendConnection(EventsConnection event, Message msg);
+
+    public abstract void onNewReciveConnection(EventsConnection event, Message msg);
+
+    public abstract void onNewErrorConnection(EventsConnection event);
 }

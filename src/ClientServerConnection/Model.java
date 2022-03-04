@@ -17,18 +17,18 @@ public class Model {
 		this.eventsListener=eventsListener;
 	}
 
-	public void iniciarServidor (int port) {
+	public void initServer (int port) {
 		servidor = new Server(bufferConnection, eventsListener);
-		servidor.runServer(port);
+		servidor.startServer(port);
 	}
 			
-	public String establirConnexio (String ip, int port) {
+	public String initConnexion (String ip, int port) {
 		this.client = new Client(bufferConnection, eventsListener);
-		String msgState = this.client.Connectar(ip, port);
+		String msgState = this.client.Connect(ip, port);
 		return msgState;
 	}
 	
-	public Server getServidor() {
+	public Server getServer() {
 		return this.servidor;
 	}
 	

@@ -24,7 +24,7 @@ public class Client {
 		this.eventsListener=eventsListener;
 	}
 	
-	public String Connectar(String ip, int port) {
+	public String Connect(String ip, int port) {
 		String msgState;
 		try {
 			Socket socket = new Socket(ip,port);

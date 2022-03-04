@@ -4,91 +4,216 @@
  * and open the template in the editor.
  */
 package ClientServerConnection;
+
+import java.awt.Color;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class Viewer extends JFrame{
-	public JTabbedPane pestanyes;
-	public JTextArea comLog;
-	public JButton connectarButton;
-	public JTextField ip;
-	public JTextField port;
-	
-	public ArrayList<JTextArea> llistaTextArea = new ArrayList<JTextArea>();
-	public ArrayList<JTextField> llistaMsgs = new ArrayList<JTextField>();
-	public ArrayList<JButton> llistaButtons = new ArrayList<JButton>();
-	public ArrayList<JPanel> llistaPanels = new ArrayList<JPanel>();
-	
-	public Viewer() {
-		//Instanciam atributs de classe
-		pestanyes = new JTabbedPane();
-		
-		//Parametritzar el JFrame (finestra)
-		setBounds(0,0,500,550);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		//Cream la primera pestanya
-		JPanel ServPane = new JPanel();
-		ServPane.setLayout(null);
-		
-		comLog = new JTextArea(450,300);
-		comLog.setBounds(10,50,450,300);
-		comLog.setEditable(false);
-		
-		JScrollPane logScroll = new JScrollPane(comLog);
-		logScroll.setBounds(10,50,450,300);
-		ServPane.add(logScroll);
-		
-		connectarButton = new JButton("Connectar");
-		connectarButton.setBounds(10,400,100,30);
-		ServPane.add(connectarButton);
-		
-		ip = new JTextField();
-		ip.setBounds(130,400,100,30);
-		ServPane.add(ip);
-		
-		port = new JTextField();
-		port.setBounds(250,400,50,30);
-		ServPane.add(port);
-		
-		pestanyes.add("Servidor",ServPane);
-		
-		//Afegir pestanyes al contenidor de la finestra
-		getContentPane().add(pestanyes);
-		setVisible(true);	
-	}
-	
-	public void novaPestanya(String ip) {
-		JPanel panel;
-		JScrollPane scroll;
-		JTextArea textArea;
-		JTextField msg;
-		JButton button;
+/**
+ * Class used to display the graphics
+ *
+ * @author alfon
+ */
+public class Viewer extends JFrame {
 
-		panel = new JPanel();
-		panel.setLayout(null);
-		
-		textArea = new JTextArea(450,300);
-		textArea.setBounds(10,50,450,300);
-		textArea.setEditable(false);
-		scroll = new JScrollPane(textArea);
-		scroll.setBounds(10,50,450,300);
-		panel.add(scroll);
-		llistaTextArea.add(textArea);
-		
-		msg = new JTextField();
-		msg.setBounds(10,400,370,30);
-		panel.add(msg);
-		llistaMsgs.add(msg);
-		
-		button = new JButton(">");
-		button.setBounds(390,400,70,30);
-		panel.add(button);
-		llistaButtons.add(button);
-		
-		pestanyes.addTab(ip, panel);
-		llistaPanels.add(panel);
-		
-	}
+    //VARIABLES
+    private JTabbedPane tabs;
+    private JTextArea commsLog;
+    private JButton connectButton;
+    private JTextField ip, port;
+    private JPanel serverPanel;
+    private ArrayList<JTextArea> textAreas = new ArrayList<JTextArea>();
+    private ArrayList<JTextField> messages = new ArrayList<JTextField>();
+    private ArrayList<JButton> buttons = new ArrayList<JButton>();
+    private ArrayList<JPanel> panels = new ArrayList<JPanel>();
+
+    //CONSTRUCTOR
+    /**
+     * sets up the jframe and the server tab
+     */
+    public Viewer() {
+        //instantiate class atributes 
+        tabs = new JTabbedPane();
+        //set up frame
+        setUpViewer();
+
+        //set up server frame
+        serverPanel = new JPanel();
+        setUpServerPanel();
+        tabs.add("Servidor", serverPanel);
+
+        //add the tabs to the frame pane
+        getContentPane().add(tabs);
+        setVisible(true);
+    }
+
+    
+    //GETTER AND SETTER
+    public JTabbedPane getTabs() {
+        return tabs;
+    }
+
+    public void setTabs(JTabbedPane tabs) {
+        this.tabs = tabs;
+    }
+
+    public JTextArea getCommsLog() {
+        return commsLog;
+    }
+
+    public void setCommsLog(JTextArea commsLog) {
+        this.commsLog = commsLog;
+    }
+
+    public JButton getConnectButton() {
+        return connectButton;
+    }
+
+    public void setConnectButton(JButton connectButton) {
+        this.connectButton = connectButton;
+    }
+
+    public JTextField getIp() {
+        return ip;
+    }
+
+    public void setIp(JTextField ip) {
+        this.ip = ip;
+    }
+
+    public JTextField getPort() {
+        return port;
+    }
+
+    public void setPort(JTextField port) {
+        this.port = port;
+    }
+
+    public ArrayList<JTextArea> getTextAreas() {
+        return textAreas;
+    }
+
+    public void setTextAreas(ArrayList<JTextArea> textAreas) {
+        this.textAreas = textAreas;
+    }
+
+    public ArrayList<JTextField> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(ArrayList<JTextField> messages) {
+        this.messages = messages;
+    }
+
+    public ArrayList<JButton> getButtons() {
+        return buttons;
+    }
+
+    public void setButtons(ArrayList<JButton> buttons) {
+        this.buttons = buttons;
+    }
+
+    public ArrayList<JPanel> getPanels() {
+        return panels;
+    }
+
+    public void setPanels(ArrayList<JPanel> panels) {
+        this.panels = panels;
+    }
+
+    /**
+     * Adds a new tab for the client side.
+     * @param ip String
+     */
+    public void newTab(String ip) {
+        //Declare variables
+        JPanel panel;
+        JScrollPane scroller;
+        JTextArea textArea;
+        JTextField message;
+        JButton button;
+
+        //set up panel
+        panel = new JPanel();
+        panel.setLayout(null);
+
+        
+        
+        textArea = new JTextArea(200, 300);
+        textArea.setBounds(10, 50, 450, 300);
+        textArea.setEditable(false);
+        scroller = new JScrollPane(textArea);
+        scroller.setBounds(15, 20, 450, 300);
+        panel.add(scroller);
+        textAreas.add(textArea);
+
+        JTextPane textMessage = new JTextPane();
+        textMessage.setBounds(10,330,100,30);
+        textMessage.setBackground(null);
+        textMessage.setEditable(false);
+        textMessage.setText("Message: ");
+        panel.add(textMessage);
+        
+        message = new JTextField();
+        message.setBounds(10, 360, 450, 30);
+        panel.add(message);
+        messages.add(message);
+
+        button = new JButton("Send");
+        button.setBounds(390, 410, 70, 30);
+        panel.add(button);
+        buttons.add(button);
+
+        tabs.addTab(ip, panel);
+        panels.add(panel);
+
+    }
+
+    private void setUpViewer() {
+        this.setBounds(0, 0, 500, 525);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //window mode
+        this.setUndecorated(true);
+        this.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+        this.setResizable(false);
+        this.setBackground(Color.yellow);
+    }
+
+    private void setUpServerPanel() {
+        serverPanel.setLayout(null);
+
+        commsLog = new JTextArea(200, 300);
+        commsLog.setBounds(10, 50, 450, 300);
+        commsLog.setEditable(false);
+
+        JScrollPane logScroll = new JScrollPane(commsLog);
+        logScroll.setBounds(15, 20, 450, 300);
+        serverPanel.add(logScroll);
+
+        
+        JTextPane textIP = new JTextPane();
+        textIP.setBounds(35,350,30,30);
+        textIP.setBackground(null);
+        textIP.setEditable(false);
+        textIP.setText("IP: ");
+        serverPanel.add(textIP);
+        ip = new JTextField();
+        ip.setBounds(65, 350, 100, 30);
+        serverPanel.add(ip);
+
+        JTextPane textPort = new JTextPane();
+        textPort.setBounds(300,350,50,30);
+        textPort.setBackground(null);
+        textPort.setEditable(false);
+        textPort.setText("PORT: ");
+        serverPanel.add(textPort);
+        port = new JTextField();
+        port.setBounds(350, 350, 50, 30);
+        serverPanel.add(port);
+        connectButton = new JButton("Connectar");
+        connectButton.setBounds(200, 400, 100, 30);
+        serverPanel.add(connectButton);
+    }
 }
