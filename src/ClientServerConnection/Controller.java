@@ -1,118 +1,123 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package ClientServerConnection;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import javax.swing.JButton;
 
+/**
+ * Controller class, this controlls all the data that passes between the viewer and the model (MVC), 
+ * and sets up the app
+ * @author alfon
+ */
 public class Controller implements ActionListener {
-    //El controlador gestiona el pas d'informació de la vista gràfica al model de dades
+    //VARIABLES
+    private Viewer viewer;
+    private Model model;
 
-    Viewer vista;
-    Model model;
-
-    //Definir els mètodes que s'han d'executar quan s'activi un event
+    /**
+     * Define all the methods that will execute when an event is triggered
+     */
     public EventsListener eventsListener = new EventsListener() {
+
+        /**
+         * When a new connection is created this will be executed, 
+         * this will add a new window, and add a listener to the new button created.
+        */
         @Override
-        //Aquest event s'executarà quan es crei una nova Connexió, ja sigui
-        //per part de la classe client com de la classe servidor.
-        //Afegeix una nova pestanya i afegeix un listener al nou boto creat.
         public void onNewConnection(EventsConnection event) {
-            vista.newTab(event.getConnection().getIP());
-            addListener(vista.getButtons().get(vista.getButtons().size() - 1));
+            viewer.newTab(event.getConnection().getIP());
+            addListener(viewer.getButtons().get(viewer.getButtons().size() - 1));
         }
 
+        /**
+         * When a message is sent this will be executed, 
+         * this will add text to the text area
+         */
         @Override
-        //Quan enviam un missatge actualitzam les areas de text.
         public void onNewSendConnection(EventsConnection event, Message msg) {
-            vista.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection()))
-                    .setText(vista.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection())).getText() + "\n" + "Me: " + msg.getMessage());
+            viewer.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection()))
+                    .setText(viewer.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection())).getText() + 
+                            "\n" + "Me: " + msg.getMessage());
         }
 
+        /**
+         * When a message is recived this will execute,
+         * this will add text to the text area
+         */
         @Override
-        //Quan rebem un missatge actualitzam les areas de text.
         public void onNewReciveConnection(EventsConnection event, Message msg) {
-            vista.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection()))
-                    .setText(vista.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection())).getText() + "\n" + event.getConnection()
-                            .getIP() + ": " + msg.getMessage());
+            viewer.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection()))
+                    .setText(viewer.getTextAreas().get(model.getBufferConnection().indexOf(event.getConnection())).getText() + 
+                            "\n" + event.getConnection().getIP() + ": " + msg.getMessage());
         }
 
+        /**
+         * When an error in the connection occur this will execute,
+         * this will throw a thread that will try to reconect
+         */
         @Override
         public void onNewErrorConnection(EventsConnection event) {
-            Thread healthThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            Socket socket = new Socket(event.getConnection().getIP(), event.getConnection().getPort());
-                            event.getConnection().setSocket(socket);
-                            break;
-                        } catch (IOException e) {
-                        }
-                        try {
-                            Thread.sleep(1 * 1000);
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }
-            });
+            HealthSurvivor hs = new HealthSurvivor(event);
+            Thread healthThread = new Thread(hs);
             healthThread.start();
         }
     };
 
+    
+    //CONSTRUCTORS
+    /**
+     * Starts the viewer and the model, and sets up the app
+     */
     public Controller() {
-        vista = new Viewer();
+        viewer = new Viewer();
         model = new Model(eventsListener);
 
         ////////////////////
-        Scanner teclat = new Scanner(System.in);
-        System.out.println("Port del servidor: ");
-        int port = Integer.parseInt(teclat.nextLine());
+        int port = Integer.parseInt(viewer.serverPortPopUp());
         ////////////////////
-
+        
         this.model.initServer(port);
-
-        this.vista.getConnectButton().addActionListener(this);
+        this.viewer.getConnectButton().addActionListener(this);
 
     }
 
+    //OVERRIDE METHODS
+    /**
+     * 
+     * @param e - ActionEvent
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String msgState;
         //Quan és pitja el boto connectar de la pestanya servidor intentam crear connexió
         //Sí es un altre boto és perque volem enviar un missatge.
-        if (e.getSource().equals(this.vista.getConnectButton())) {
+        if (e.getSource().equals(this.viewer.getConnectButton())) {
             //Intentam connectar amb la IP i el port que s'ha indicat a la pestanya servidor
             try {
-                msgState = this.model.initConnexion(this.vista.getIp().getText(), Integer.parseInt(this.vista.getPort().getText()));
+                msgState = this.model.initConnexion(this.viewer.getIp().getText(), Integer.parseInt(this.viewer.getPort().getText()));
             } catch (Exception error) {
                 msgState = "Error amb la IP i el port: " + error.getMessage();
             }
 
-            this.vista.getCommsLog().setText(this.vista.getCommsLog().getText() + "\n" + msgState);
+            this.viewer.getCommsLog().setText(this.viewer.getCommsLog().getText() + "\n" + msgState);
         } else {
             sendMessage(e);
         }
     }
 
+    //PUBLIC METHODS
     public void addListener(JButton button) {
         button.addActionListener(this);
     }
 
     public void sendMessage(ActionEvent e) {
         Message message = new Message();
-        message.setMessage(this.vista.getMessages().get(this.vista.getButtons().indexOf(e.getSource())).getText());
-        this.model.getBufferConnection().get(this.vista.getButtons().indexOf(e.getSource())).send(message);
-        this.vista.getMessages().get(this.vista.getButtons().indexOf(e.getSource())).setText("");
+        message.setMessage(this.viewer.getMessages().get(this.viewer.getButtons().indexOf(e.getSource())).getText());
+        this.model.getBufferConnection().get(this.viewer.getButtons().indexOf(e.getSource())).send(message);
+        this.viewer.getMessages().get(this.viewer.getButtons().indexOf(e.getSource())).setText("");
     }
 
 }

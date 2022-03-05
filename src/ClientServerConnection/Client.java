@@ -5,38 +5,53 @@
  */
 package ClientServerConnection;
 
+import java.net.Socket;
+import java.util.ArrayList;
+
 /**
+ * Clase client
  *
  * @author alfon
  */
-import java.net.Socket;
-import java.util.ArrayList;
-
-import java.net.Socket;
-import java.util.ArrayList;
-
 public class Client {
-	private ArrayList<Connection> bufferConnection;
-	private EventsListener eventsListener;
-	
-	public Client (ArrayList<Connection> bufferConnection,EventsListener eventsListener) {
-		this.bufferConnection=bufferConnection;
-		this.eventsListener=eventsListener;
-	}
-	
-	public String Connect(String ip, int port) {
-		String msgState;
-		try {
-			Socket socket = new Socket(ip,port);
-			Connection connection = new Connection(socket);
-			connection.addListener(eventsListener);
-			connection.triggerConnectionEvent();
-			bufferConnection.add(connection);
-			msgState = "Connexió establerta amb: "+ip+":"+port;
-		}catch (Exception e) {
-			System.out.println("Error al connectar: "+ e.getMessage());
-			msgState = "Error al connectar: "+ e.getMessage();
-		}
-		return msgState;
-	}
+    //VARIABLES
+    private ArrayList<Connection> bufferConnection;
+    private EventsListener eventsListener;
+
+    //CONSTRUCTOR
+    /**
+     * Initialitzes variables
+     *
+     * @param bufferConnection - Arraylist of Connection
+     * @param eventsListener - EventListener
+     */
+    public Client(ArrayList<Connection> bufferConnection, EventsListener eventsListener) {
+        this.bufferConnection = bufferConnection;
+        this.eventsListener = eventsListener;
+    }
+
+    //PUBLIC METHODS
+    /**
+     * Trys to connect to the server
+     *
+     * @param ip - String
+     * @param port - int
+     * @return String - Message state
+     */
+    public String Connect(String ip, int port) {
+        String messageState;
+        try {
+            //Connection to the server
+            Socket socket = new Socket(ip, port);
+            //Starts the connection
+            Connection connection = new Connection(socket);
+            connection.addListener(eventsListener);
+            connection.triggerConnectionEvent();
+            bufferConnection.add(connection);
+            messageState = "Established connection: " + ip + ":" + port;
+        } catch (Exception e) {
+            messageState = "Connection error: " + e.getMessage();
+        }
+        return messageState;
+    }
 }

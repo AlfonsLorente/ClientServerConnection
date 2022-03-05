@@ -14,16 +14,14 @@ public class EventsConnection extends EventObject {
 
     public EventsConnection(Connection connection) {
         super(connection);
-        setConnection(connection);
+        this.connection = connection;
     }
 
-    //Setters i Getters
+    //GETTERS AND SETTERS
     public Connection getConnection() {
         return connection;
     }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
+
 
 }

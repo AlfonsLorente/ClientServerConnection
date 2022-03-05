@@ -42,7 +42,7 @@ public class Viewer extends JFrame {
         //set up server frame
         serverPanel = new JPanel();
         setUpServerPanel();
-        tabs.add("Servidor", serverPanel);
+        tabs.add("Server", serverPanel);
 
         //add the tabs to the frame pane
         getContentPane().add(tabs);
@@ -219,11 +219,18 @@ public class Viewer extends JFrame {
         port = new JTextField();
         port.setBounds(350, 350, 50, 30);
         serverPanel.add(port);
-        connectButton = new JButton("Connectar");
+        connectButton = new JButton("Connect");
         connectButton.setBackground(Color.WHITE);
         
         connectButton.setBounds(200, 400, 100, 30);
         serverPanel.add(connectButton);
 
     }
+    
+    
+    public String serverPortPopUp(){
+        return JOptionPane.showInputDialog(this,"INSERT SERVER PORT", null);
+        
+    }
+    
 }

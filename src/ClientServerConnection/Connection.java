@@ -12,58 +12,95 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+/**
+ * Connection class, this comunicates with the client
+ *
+ * @author alfon
+ */
 public class Connection {
 
+    //VARIABLES
     private Socket socket;
-    private ObjectInputStream bufferEntrada;
-    private ObjectOutputStream bufferSortida;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private String ip;
     private int port;
     private int localPort;
 
     private ArrayList<EventsListener> listeners = new ArrayList<EventsListener>();
 
+    //CONSTRUCTORS
+    /**
+     * Set up variables and run connection
+     *
+     * @param socket - Socket
+     */
     public Connection(Socket socket) {
         this.socket = socket;
-        this.ip = this.socket.getInetAddress().toString().substring(1, this.socket.getInetAddress().toString().length());
-        System.out.println(this.ip);
+        this.ip = this.socket.getInetAddress().toString();
         this.port = this.socket.getPort();
-        System.out.println(this.port);
         this.localPort = this.socket.getLocalPort();
-        System.out.println(this.localPort);
         runConnection();
     }
 
+    //GETTERS AND SETTERS
+    public String getIP() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+        runConnection();
+    }
+
+    /**
+     * Set up channels and recive
+     */
     public void runConnection() {
-        channels();
+        System.out.println("pppp");
+
+        setChannels();
+        System.out.println("aaaa");
         recive();
+        System.out.println("bbb");
     }
 
-    public String channels() {
-        String msgState = "";
+    /**
+     * set up channels
+     * @return String
+     */
+    public String setChannels() {
+        String messageState = "";
         try {
-            bufferSortida = new ObjectOutputStream(socket.getOutputStream());
-            bufferEntrada = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());//output channel
+            in = new ObjectInputStream(socket.getInputStream());//input channel
+
         } catch (Exception e) {
-            msgState = "Error als canals: " + e.getMessage();
+            messageState = "Channel error: " + e.getMessage();
         }
-        return msgState;
+        return messageState;
     }
 
-    public synchronized void send(Message msg) {
+    /**
+     * Creates a thread that sends a message to the server
+     * @param message - Message
+     */
+    public synchronized void send(Message message) {
         Thread connectionThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    bufferSortida.writeObject(msg);
-                    triggerSendEvent(msg);
+                    out.writeObject(message);
+                    triggerSendEvent(message);
                 } catch (Exception e) {
-                    System.out.println("Error a enviar: " + e.getMessage());
                     triggerErrorEvent();
                     try {
                         socket.close();
-                    } catch (IOException e1) {
-                        // TODO Auto-generated catch block
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 }
@@ -72,31 +109,38 @@ public class Connection {
         connectionThread.start();
     }
 
+    /**
+     * Creates a thread that listens for the input of a message
+     */
     public void recive() {
-        Thread fil = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public synchronized void run() {
                 Message message;
                 while (true) {
                     try {
-                        message = (Message) bufferEntrada.readObject();
+                        message = (Message) in.readObject();
                         triggerReciveEvent(message);
-                        System.out.println(socket.getInetAddress() + ": " + message.getMessage());
                     } catch (Exception e) {
-                        System.out.println("Error a rebre: " + e.getMessage());
                         triggerErrorEvent();
                         break;
                     }
                 }
             }
         });
-        fil.start();
+        thread.start();
     }
-
+    /**
+     * Adds a listener to the array
+     * @param listener - EventsListener
+     */
     public void addListener(EventsListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Triggers all the connection events
+     */
     public void triggerConnectionEvent() {
         ListIterator<EventsListener> li = listeners.listIterator();
         while (li.hasNext()) {
@@ -105,7 +149,10 @@ public class Connection {
             (listener).onNewConnection(readerEvents);
         }
     }
-
+    
+    /**
+     * Triggers all the sends events
+     */
     public void triggerSendEvent(Message msg) {
         ListIterator<EventsListener> li = listeners.listIterator();
         while (li.hasNext()) {
@@ -115,6 +162,10 @@ public class Connection {
         }
     }
 
+    /**
+     * Triggers all the recive listeners
+     * @param msg - Message
+     */
     public void triggerReciveEvent(Message msg) {
         ListIterator<EventsListener> li = listeners.listIterator();
         while (li.hasNext()) {
@@ -124,6 +175,9 @@ public class Connection {
         }
     }
 
+    /**
+     * Triger all the error listeners
+     */
     public void triggerErrorEvent() {
         ListIterator<EventsListener> li = listeners.listIterator();
         while (li.hasNext()) {
@@ -131,19 +185,6 @@ public class Connection {
             EventsConnection readerEvents = new EventsConnection(this);
             (listener).onNewErrorConnection(readerEvents);
         }
-    }
-
-    public String getIP() {
-        return this.ip;
-    }
-
-    public int getPort() {
-        return this.port;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-        runConnection();
     }
 
 }
