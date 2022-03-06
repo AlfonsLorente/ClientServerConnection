@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ClientServerConnection;
 
 import java.io.IOException;
@@ -57,36 +52,10 @@ public class Connection {
         runConnection();
     }
 
-    /**
-     * Set up channels and recive
-     */
-    public void runConnection() {
-        System.out.println("pppp");
-
-        setChannels();
-        System.out.println("aaaa");
-        recive();
-        System.out.println("bbb");
-    }
-
-    /**
-     * set up channels
-     * @return String
-     */
-    public String setChannels() {
-        String messageState = "";
-        try {
-            out = new ObjectOutputStream(socket.getOutputStream());//output channel
-            in = new ObjectInputStream(socket.getInputStream());//input channel
-
-        } catch (Exception e) {
-            messageState = "Channel error: " + e.getMessage();
-        }
-        return messageState;
-    }
-
+    //PUBLIC METHODS
     /**
      * Creates a thread that sends a message to the server
+     *
      * @param message - Message
      */
     public synchronized void send(Message message) {
@@ -110,28 +79,8 @@ public class Connection {
     }
 
     /**
-     * Creates a thread that listens for the input of a message
-     */
-    public void recive() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public synchronized void run() {
-                Message message;
-                while (true) {
-                    try {
-                        message = (Message) in.readObject();
-                        triggerReciveEvent(message);
-                    } catch (Exception e) {
-                        triggerErrorEvent();
-                        break;
-                    }
-                }
-            }
-        });
-        thread.start();
-    }
-    /**
      * Adds a listener to the array
+     *
      * @param listener - EventsListener
      */
     public void addListener(EventsListener listener) {
@@ -149,7 +98,7 @@ public class Connection {
             (listener).onNewConnection(readerEvents);
         }
     }
-    
+
     /**
      * Triggers all the sends events
      */
@@ -164,6 +113,7 @@ public class Connection {
 
     /**
      * Triggers all the recive listeners
+     *
      * @param msg - Message
      */
     public void triggerReciveEvent(Message msg) {
@@ -185,6 +135,54 @@ public class Connection {
             EventsConnection readerEvents = new EventsConnection(this);
             (listener).onNewErrorConnection(readerEvents);
         }
+    }
+
+    //PRIVATE METHODS
+    /**
+     * Set up channels and recive
+     */
+    private void runConnection() {
+        setChannels();
+        recive();
+    }
+
+    /**
+     * set up channels
+     *
+     * @return String
+     */
+    private String setChannels() {
+        String messageState = "";
+        try {
+            out = new ObjectOutputStream(socket.getOutputStream());//output channel
+            in = new ObjectInputStream(socket.getInputStream());//input channel
+
+        } catch (Exception e) {
+            messageState = "Channel error: " + e.getMessage();
+        }
+        return messageState;
+    }
+
+    /**
+     * Creates a thread that listens for the input of a message
+     */
+    private void recive() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                Message message;
+                while (true) {
+                    try {
+                        message = (Message) in.readObject();
+                        triggerReciveEvent(message);
+                    } catch (Exception e) {
+                        triggerErrorEvent();
+                        break;
+                    }
+                }
+            }
+        });
+        thread.start();
     }
 
 }

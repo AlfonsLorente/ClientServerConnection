@@ -1,16 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ClientServerConnection;
 
 import java.io.Serializable;
 
+/**
+ * Message that will me changed
+ *
+ * @author alfon
+ */
 public class Message implements Serializable {
 
+    //VARIABLES
     private String message = new String();
 
+    //GETTERS AND SETTERS
     public String getMessage() {
         return message;
     }

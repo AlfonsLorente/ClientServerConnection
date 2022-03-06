@@ -1,38 +1,61 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ClientServerConnection;
 
 import java.util.ArrayList;
 
+/**
+ * Data model to store the data values
+ *
+ * @author alfon
+ */
 public class Model {
-	private Client client;
-	private Server servidor;
-	private ArrayList<Connection> bufferConnection = new ArrayList<Connection>();
-	private EventsListener eventsListener;
-	
-	public Model (EventsListener eventsListener) {
-		this.eventsListener=eventsListener;
-	}
 
-	public void initServer (int port) {
-		servidor = new Server(bufferConnection, eventsListener);
-		servidor.startServer(port);
-	}
-			
-	public String initConnexion (String ip, int port) {
-		this.client = new Client(bufferConnection, eventsListener);
-		String msgState = this.client.Connect(ip, port);
-		return msgState;
-	}
-	
-	public Server getServer() {
-		return this.servidor;
-	}
-	
-	public ArrayList<Connection> getBufferConnection (){
-		return this.bufferConnection;
-	}
+    //VARIABLES
+    private Client client;
+    private Server server;
+    private ArrayList<Connection> bufferConnection = new ArrayList<Connection>();
+    private EventsListener eventsListener;
+
+    //CONSTRUCTORS
+    /**
+     * Initialize eventsListener
+     *
+     * @param eventsListener EventsListeners
+     */
+    public Model(EventsListener eventsListener) {
+        this.eventsListener = eventsListener;
+    }
+
+    //GETTERS AND SETTERS
+    public Server getServer() {
+        return this.server;
+    }
+
+    public ArrayList<Connection> getBufferConnection() {
+        return bufferConnection;
+    }
+
+    //PUBLIC METHODS
+    /**
+     * Starts the server
+     *
+     * @param port int
+     */
+    public void initServer(int port) {
+        server = new Server(bufferConnection, eventsListener);
+        server.startServer(port);
+    }
+
+    /**
+     * Initialize the connection with the client
+     *
+     * @param ip String
+     * @param port int
+     * @return String
+     */
+    public String initConnexion(String ip, int port) {
+        this.client = new Client(bufferConnection, eventsListener);
+        String messageState = this.client.Connect(ip, port);
+        return messageState;
+    }
+
 }
