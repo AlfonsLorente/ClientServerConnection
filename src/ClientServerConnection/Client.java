@@ -1,58 +1,53 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ClientServerConnection;
 
+import java.net.Socket;
+import java.util.ArrayList;
+
 /**
+ * Model class for client
  *
  * @author alfon
  */
-import java.io.*;
-import java.net.Socket;
-
-import java.io.*;
-import java.net.*;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class Client {
 
-    private Socket socket;
-    private MyTask myTask;
-    private Connection connection;
+    //VARIABLES
+    private ArrayList<Connection> bufferConnection;
+    private EventsListener eventsListener;
 
-    public Client(MyTask myTask) {
-        this.myTask = myTask;
+    //CONSTRUCTOR
+    /**
+     * Initialitzes variables
+     *
+     * @param bufferConnection - Arraylist of Connection
+     * @param eventsListener - EventListener
+     */
+    public Client(ArrayList<Connection> bufferConnection, EventsListener eventsListener) {
+        this.bufferConnection = bufferConnection;
+        this.eventsListener = eventsListener;
     }
 
-    public void run() {
-        Scanner scanner = new Scanner(System.in);
-
-        Thread clientThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-
-                    System.out.println("Introduce the server IP:");
-                    String ip = scanner.nextLine();
-                    System.out.println("Introduce the server port");
-                    int port = Integer.parseInt(scanner.nextLine());
-
-                    try {
-                        socket = new Socket(ip, port);
-                        connection = new Connection(socket);
-                        myTask.bufferConnection.add(connection);
-
-                    } catch (IOException ex) {
-                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-        clientThread.start();
-
+    //PUBLIC METHODS
+    /**
+     * Trys to connect to the server
+     *
+     * @param ip - String
+     * @param port - int
+     * @return String - Message state
+     */
+    public String Connect(String ip, int port) {
+        String messageState;
+        try {
+            //Connection to the server
+            Socket socket = new Socket(ip, port);
+            //Starts the connection
+            Connection connection = new Connection(socket);
+            connection.addListener(eventsListener);
+            connection.triggerConnectionEvent();
+            bufferConnection.add(connection);
+            messageState = "Established connection: " + ip + ":" + port;
+        } catch (Exception e) {
+            messageState = "Connection error: " + e.getMessage();
+        }
+        return messageState;
     }
 }

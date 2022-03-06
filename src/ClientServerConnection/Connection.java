@@ -1,81 +1,188 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ClientServerConnection;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.ListIterator;
 
 /**
+ * Connection class, this comunicates with the client
  *
  * @author alfon
  */
 public class Connection {
 
+    //VARIABLES
     private Socket socket;
-    private ObjectInputStream inputBuffer;
-    private ObjectOutputStream outputBuffer;
-    private Thread connectionThread;
-    private Message message = new Message();
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private String ip;
+    private int port;
+    private int localPort;
 
+    private ArrayList<EventsListener> listeners = new ArrayList<EventsListener>();
+
+    //CONSTRUCTORS
+    /**
+     * Set up variables and run connection
+     *
+     * @param socket - Socket
+     */
     public Connection(Socket socket) {
         this.socket = socket;
-        this.runConnection();
+        this.ip = this.socket.getInetAddress().toString();
+        this.port = this.socket.getPort();
+        this.localPort = this.socket.getLocalPort();
+        runConnection();
     }
 
-    public void runConnection() {
-        connectionThread = new Thread(new Runnable() {
+    //GETTERS AND SETTERS
+    public String getIP() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+        runConnection();
+    }
+
+    //PUBLIC METHODS
+    /**
+     * Creates a thread that sends a message to the server
+     *
+     * @param message - Message
+     */
+    public synchronized void send(Message message) {
+        Thread connectionThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                chanel();
-                recive();
-                send(message);
+                try {
+                    out.writeObject(message);
+                    triggerSendEvent(message);
+                } catch (Exception e) {
+                    triggerErrorEvent();
+                    try {
+                        socket.close();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         });
         connectionThread.start();
     }
 
-    public void chanel() {
-        try {
-            outputBuffer = new ObjectOutputStream(socket.getOutputStream());
-            inputBuffer = new ObjectInputStream(socket.getInputStream());
-        } catch (Exception e) {
-            System.out.println("Chanel error: " + e.getMessage());
+    /**
+     * Adds a listener to the array
+     *
+     * @param listener - EventsListener
+     */
+    public void addListener(EventsListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Triggers all the connection events
+     */
+    public void triggerConnectionEvent() {
+        ListIterator<EventsListener> li = listeners.listIterator();
+        while (li.hasNext()) {
+            EventsListener listener = (EventsListener) li.next();
+            EventsConnection readerEvents = new EventsConnection(this);
+            (listener).onNewConnection(readerEvents);
         }
     }
 
-    public void recive() {
-        Thread fil = new Thread(new Runnable() {
+    /**
+     * Triggers all the sends events
+     */
+    public void triggerSendEvent(Message msg) {
+        ListIterator<EventsListener> li = listeners.listIterator();
+        while (li.hasNext()) {
+            EventsListener listener = (EventsListener) li.next();
+            EventsConnection readerEvents = new EventsConnection(this);
+            (listener).onNewSendConnection(readerEvents, msg);
+        }
+    }
+
+    /**
+     * Triggers all the recive listeners
+     *
+     * @param msg - Message
+     */
+    public void triggerReciveEvent(Message msg) {
+        ListIterator<EventsListener> li = listeners.listIterator();
+        while (li.hasNext()) {
+            EventsListener listener = (EventsListener) li.next();
+            EventsConnection readerEvents = new EventsConnection(this);
+            (listener).onNewReciveConnection(readerEvents, msg);
+        }
+    }
+
+    /**
+     * Triger all the error listeners
+     */
+    public void triggerErrorEvent() {
+        ListIterator<EventsListener> li = listeners.listIterator();
+        while (li.hasNext()) {
+            EventsListener listener = (EventsListener) li.next();
+            EventsConnection readerEvents = new EventsConnection(this);
+            (listener).onNewErrorConnection(readerEvents);
+        }
+    }
+
+    //PRIVATE METHODS
+    /**
+     * Set up channels and recive
+     */
+    private void runConnection() {
+        setChannels();
+        recive();
+    }
+
+    /**
+     * set up channels
+     *
+     * @return String
+     */
+    private String setChannels() {
+        String messageState = "";
+        try {
+            out = new ObjectOutputStream(socket.getOutputStream());//output channel
+            in = new ObjectInputStream(socket.getInputStream());//input channel
+
+        } catch (Exception e) {
+            messageState = "Channel error: " + e.getMessage();
+        }
+        return messageState;
+    }
+
+    /**
+     * Creates a thread that listens for the input of a message
+     */
+    private void recive() {
+        Thread thread = new Thread(new Runnable() {
             @Override
-            public void run() {
+            public synchronized void run() {
                 Message message;
                 while (true) {
-                    try{
-                        message = (Message)inputBuffer.readObject();
-                        System.out.println(socket.getInetAddress()+ ": " + message.getMessage());
+                    try {
+                        message = (Message) in.readObject();
+                        triggerReciveEvent(message);
                     } catch (Exception e) {
-                        System.out.println("recive error: " + e.getMessage());
+                        triggerErrorEvent();
+                        break;
                     }
                 }
             }
         });
-        fil.start();
-    }
-
-    public void send(Message message) {
-        try {
-            outputBuffer.writeObject(message);
-
-        } catch (Exception e) {
-            System.out.println("sernd error: " + e.getMessage());
-        }
+        thread.start();
     }
 
 }
