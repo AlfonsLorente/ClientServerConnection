@@ -4,7 +4,14 @@ import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 import javax.swing.*;
 
@@ -28,6 +35,9 @@ public class Viewer extends JFrame {
     private JButton serverPortButton;
     private JTextField serverPort;
     private JFrame popUp;
+    private BufferedImage bg;
+    private Color[] colors = new Color[]{Color.BLUE, Color.CYAN, Color.LIGHT_GRAY, Color.MAGENTA, Color.RED, Color.YELLOW,
+        Color.PINK, Color.ORANGE, Color.GRAY, Color.WHITE};
 
     //CONSTRUCTOR
     /**
@@ -163,6 +173,8 @@ public class Viewer extends JFrame {
         //set up panel
         panel = new JPanel();
         panel.setLayout(null);
+        Random random = new Random();
+        panel.setBackground(colors[random.nextInt(9)]);
 
         //set up the text area
         textArea = new JTextArea(200, 300);
@@ -215,6 +227,8 @@ public class Viewer extends JFrame {
 
         //Jpanel set up
         JPanel jPanel = new JPanel();
+        Random random = new Random();
+        jPanel.setBackground(colors[random.nextInt(9)]);
         jPanel.setBounds(0, 0, 220, 120);
         jPanel.setLayout(null);
 
@@ -264,6 +278,8 @@ public class Viewer extends JFrame {
      * Set up the panel for the server tab
      */
     private void setUpServerPanel() {
+        Random random = new Random();
+        serverPanel.setBackground(colors[random.nextInt(9)]);
         serverPanel.setLayout(null);//jpanel layout
         //Set up comms log
         commsLog = new JTextArea(200, 300);
@@ -304,5 +320,6 @@ public class Viewer extends JFrame {
         serverPanel.add(connectButton);
 
     }
+    
 
 }
