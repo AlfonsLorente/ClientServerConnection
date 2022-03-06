@@ -13,7 +13,7 @@ public class HealthSurvivor implements Runnable {
 
     //VARIABLES
     private EventsConnection event;
-    private static final int MAX_WAIT_TIME = 120;//1 min 120 try
+    private static final int MAX_WAIT_TIME = 240;//1 min 120 try
 
     //CONSTRUCTORS
     /**
