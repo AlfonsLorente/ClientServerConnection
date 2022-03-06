@@ -20,7 +20,6 @@ public class Connection {
     private ObjectOutputStream out;
     private String ip;
     private int port;
-    private int localPort;
 
     private ArrayList<EventsListener> listeners = new ArrayList<EventsListener>();
 
@@ -32,9 +31,8 @@ public class Connection {
      */
     public Connection(Socket socket) {
         this.socket = socket;
-        this.ip = this.socket.getInetAddress().toString();
+        this.ip = this.socket.getInetAddress().toString().substring(1, this.socket.getInetAddress().toString().length());
         this.port = this.socket.getPort();
-        this.localPort = this.socket.getLocalPort();
         runConnection();
     }
 
