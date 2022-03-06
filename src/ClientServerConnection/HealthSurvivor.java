@@ -13,7 +13,7 @@ public class HealthSurvivor implements Runnable {
 
     //VARIABLES
     private EventsConnection event;
-    private static final int MAX_WAIT_TIME = 240;//1 min 120 try
+    private static final int MAX_WAIT_TIME = 120;//1 min 120 try
 
     //CONSTRUCTORS
     /**
@@ -31,8 +31,8 @@ public class HealthSurvivor implements Runnable {
      */
     @Override
     public void run() {
-        int count = 1;
-        while (count <= MAX_WAIT_TIME) {
+        int count = 0;
+        while (count < MAX_WAIT_TIME) {
             try {
                 //Reconect to the server socket
                 Socket socket = new Socket(event.getConnection().getIP(), event.getConnection().getPort());
